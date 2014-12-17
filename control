@@ -1,9 +1,9 @@
 Package: com.zumicts.quizzerup
 Name: QuizzerUp
 Depends: mobilesubstrate
-Version: 0.0.1
+Version: 2.0
 Architecture: iphoneos-arm
-Description: An awesome MobileSubstrate tweak!
+Description: An awesome QuizUp bot tweak!
 Maintainer: Zumicts
 Author: Zumicts
 Section: Tweaks
