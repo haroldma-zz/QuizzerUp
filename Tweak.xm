@@ -24,6 +24,11 @@
 - (void)playerChoseAnswer:(id)answer;
 @end
 
+@interface SceneController : NSObject {}
++(id)sharedInstance;
+-(void)showAlertWithTitle:(id)title message:(id)message;
+@end
+
 ////////////////////////////
 ////////////////////////////
 
@@ -51,6 +56,31 @@ Question *currentQuestion;
 
   //call the following method to select it (passing the id only)
   [self playerChoseAnswer:correctAnswer.ID];
+}
+
+-(void)matchEndedWithGameResult:(id)gameResult{
+	%orig;
+
+	//find a way to automatically find a new match
+}
+
+%end
+
+%hook AppDelegate
+
+-(BOOL)application:(id)application didFinishLaunchingWithOptions:(id)options{
+
+	//need to call the original method, where it initiates the SceneController
+	BOOL result = %orig;
+
+	//by using the scenecontroller we can show a QuizUp alert
+	//making it look official :)
+	[[%c(SceneController) sharedInstance]
+		showAlertWithTitle:@"QuizzerUp v2.0"
+		message:@"Enjoy the hack and follow @zumicts for updates and requests."];
+
+	//now return the original result
+	return result;
 }
 
 %end
