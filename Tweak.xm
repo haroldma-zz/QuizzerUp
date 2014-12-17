@@ -27,6 +27,7 @@
 @interface SceneController : NSObject {}
 +(id)sharedInstance;
 -(void)showAlertWithTitle:(id)title message:(id)message;
+-(void)runMatchupPreambleScene:(id)scene source:(id)source;
 @end
 
 ////////////////////////////
@@ -34,6 +35,9 @@
 
 //local variable use for storing the current question
 Question *currentQuestion;
+
+//for saving current topic for auto-finding matches
+NSObject *match_scene;
 
 //Hooking to the match scene (where all the magic happens)
 %hook MatchScene
@@ -58,10 +62,17 @@ Question *currentQuestion;
   [self playerChoseAnswer:correctAnswer.ID];
 }
 
--(void)matchEndedWithGameResult:(id)gameResult{
+%end
+
+%hook EndGameScene
+
+//called when the transition ends
+-(void)enterTransitionDidEnd{
 	%orig;
 
-	//find a way to automatically find a new match
+	//perfect time for a match up
+	[[%c(SceneController) sharedInstance]
+		runMatchupPreambleScene:match_scene source:nil];
 }
 
 %end
@@ -81,6 +92,16 @@ Question *currentQuestion;
 
 	//now return the original result
 	return result;
+}
+
+%end
+
+%hook SceneController
+
+-(void)runMatchupPreambleScene:(id)scene source:(id)source{
+	//saving the topic for re-matchup at the end
+	match_scene = scene;
+	%orig;
 }
 
 %end
