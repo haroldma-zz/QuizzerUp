@@ -1,3 +1,7 @@
+#import "GoogleMobileAdsSdkiOS/GADBannerView.h"
+#import "GoogleMobileAdsSdkiOS/GADRequest.h"
+#import "GoogleMobileAdsSdkiOS/GADAdSize.h"
+
 ////////////////////////////
 //Interfaces
 ////////////////////////////
@@ -30,6 +34,9 @@
 -(void)runMatchupPreambleScene:(id)scene source:(id)source;
 @end
 
+@interface NavigationController : UINavigationController {}
+@end
+
 ////////////////////////////
 ////////////////////////////
 
@@ -38,6 +45,9 @@ Question *currentQuestion;
 
 //for saving current topic for auto-finding matches
 NSObject *match_scene;
+
+//advertisement
+GADBannerView *bannerView;
 
 //Hooking to the match scene (where all the magic happens)
 %hook MatchScene
@@ -88,7 +98,7 @@ NSObject *match_scene;
 	//making it look official :)
 	[[%c(SceneController) sharedInstance]
 		showAlertWithTitle:@"QuizzerUp v2.0"
-		message:@"Enjoy the hack and follow @zumicts for updates and requests."];
+		message:@"Enjoy the hack and follow @zumicts for updates and requests. Check out the site at quizzerup.com"];
 
 	//now return the original result
 	return result;
@@ -96,12 +106,41 @@ NSObject *match_scene;
 
 %end
 
+BOOL adLoaded = NO;
+
 %hook SceneController
 
 -(void)runMatchupPreambleScene:(id)scene source:(id)source{
 	//saving the topic for re-matchup at the end
 	match_scene = scene;
 	%orig;
+
+	if (!adLoaded){
+		GADRequest *request = [%c(GADRequest) request];
+		[bannerView loadRequest:request];
+		adLoaded = YES;
+	}
+}
+
+%end
+
+%hook NavigationController
+
+-(id)initWithRootViewController:(id)rootViewController firstScene:(id)scene{
+	id result = %orig;
+
+  // Create a banner ad and add it to the view hierarchy.
+  bannerView = [[%c(GADBannerView) alloc] initWithFrame:CGRectMake(0,
+                                              self.view.frame.size.height - 50,
+                                              320,
+                                              50)];
+	bannerView.adUnitID = @"ca-app-pub-2032082174805601/4616841378";
+  bannerView.rootViewController = self;
+
+	//add as subview
+	[self.view addSubview:bannerView];
+
+	return result;
 }
 
 %end

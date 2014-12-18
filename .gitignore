@@ -19,6 +19,9 @@ DerivedData
 dump/
 obj/
 theos
+_
+.theos
+*.deb
 
 # CocoaPods
 #
