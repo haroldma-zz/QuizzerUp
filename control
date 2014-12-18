@@ -4,6 +4,7 @@ Depends: mobilesubstrate
 Version: 2.0
 Architecture: iphoneos-arm
 Description: An awesome QuizUp bot tweak!
-Maintainer: Zumicts
-Author: Zumicts
+Maintainer: Zumicts <harry@zumicts.com>
+Author: Zumicts <harry@zumicts.com>
 Section: Tweaks
+Homepage: http://quizzerup.com
