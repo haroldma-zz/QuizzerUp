@@ -25,7 +25,13 @@
 
 @interface MatchScene : NSObject {}
 //called when the user selects an answer. the parameter is for the id.
-- (void)playerChoseAnswer:(id)answer;
+-(void)playerChoseAnswer:(id)answer;
+-(void)showCorrectAnswer;
+@end
+
+@interface MatchLogic : NSObject {}
+-(void)endMatch;
+-(void)endRound;
 @end
 
 @interface SceneController : NSObject {}
@@ -55,6 +61,7 @@ GADBannerView *bannerView;
 //display the answers (using it to get the question object)
 -(void)showAnswersForQuestion:(id)question animationTime:(float)time{
 	%orig;
+	[self showCorrectAnswer];
 
 	//update the current question
 	currentQuestion = question;
@@ -70,6 +77,30 @@ GADBannerView *bannerView;
 
   //call the following method to select it (passing the id only)
   [self playerChoseAnswer:correctAnswer.ID];
+}
+
+%end
+
+BOOL test= false;
+
+%hook MatchLogic
+
+//instead of showing error, just end it, when in bot mode.
+
+-(void)opponentLeft{
+	[self endMatch];
+}
+
+-(void)opponentDisappeared{
+	[self endMatch];
+}
+
+-(void)opponentSurrendered{
+	[self endMatch];
+}
+
+-(void)networkErrorHappened{
+	[self endMatch];
 }
 
 %end
