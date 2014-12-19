@@ -81,8 +81,6 @@ GADBannerView *bannerView;
 
 %end
 
-BOOL test= false;
-
 %hook MatchLogic
 
 //instead of showing error, just end it, when in bot mode.
