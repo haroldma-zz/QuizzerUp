@@ -61,7 +61,9 @@ GADBannerView *bannerView;
 //prefs bundle
 inline bool GetPrefBool(NSString *key)
 {
-	return [[[NSDictionary dictionaryWithContentsOfFile:PLIST_PATH] valueForKey:key] boolValue];
+	NSDictionary *quizzerUpTweakSettings = [NSDictionary dictionaryWithContentsOfFile:PLIST_PATH];
+	NSNumber *value = quizzerUpTweakSettings[key];
+	return value ? [value boolValue] : YES;
 }
 
 
