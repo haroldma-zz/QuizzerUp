@@ -1,0 +1,10 @@
+{
+    entry = {
+	bundle = QuizzerUpPrefs;
+	cell = PSLinkCell;
+	detail = QuizzerUpPrefsListController;
+	icon = QuizzerUpPrefs.png;
+	isController = 1;
+	label = QuizzerUp;
+    };
+}

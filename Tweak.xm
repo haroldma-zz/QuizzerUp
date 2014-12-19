@@ -1,3 +1,5 @@
+#define PLIST_PATH @"/var/mobile/Library/Preferences/com.zumicts.quizzerupprefs.plist"
+
 #import "GoogleMobileAdsSdkiOS/GADBannerView.h"
 #import "GoogleMobileAdsSdkiOS/GADRequest.h"
 #import "GoogleMobileAdsSdkiOS/GADAdSize.h"
@@ -55,14 +57,24 @@ NSObject *match_scene;
 //advertisement
 GADBannerView *bannerView;
 
+
+//prefs bundle
+inline bool GetPrefBool(NSString *key)
+{
+	return [[[NSDictionary dictionaryWithContentsOfFile:PLIST_PATH] valueForKey:key] boolValue];
+}
+
+
 //Hooking to the match scene (where all the magic happens)
 %hook MatchScene
 
 //display the answers (using it to get the question object)
 -(void)showAnswersForQuestion:(id)question animationTime:(float)time{
 	%orig;
-	[self showCorrectAnswer];
 
+	if(GetPrefBool(@"AnswerIndicator")) {
+		[self showCorrectAnswer];
+	}
 	//update the current question
 	currentQuestion = question;
 }
@@ -70,13 +82,14 @@ GADBannerView *bannerView;
 //user can now chose an answer, we do it for them ;)
 -(void)answerPeriodStarted:(double)started{
 	%orig;
+	if(GetPrefBool(@"BotMode")) {
+		//get the correct answer
+		Answer *correctAnswer = [currentQuestion.answers
+																objectAtIndex:currentQuestion.correctAnswerIndex];
 
-	//get the correct answer
-	Answer *correctAnswer = [currentQuestion.answers
-															objectAtIndex:currentQuestion.correctAnswerIndex];
-
-  //call the following method to select it (passing the id only)
-  [self playerChoseAnswer:correctAnswer.ID];
+	  //call the following method to select it (passing the id only)
+	  [self playerChoseAnswer:correctAnswer.ID];
+	}
 }
 
 %end
@@ -86,19 +99,39 @@ GADBannerView *bannerView;
 //instead of showing error, just end it, when in bot mode.
 
 -(void)opponentLeft{
-	[self endMatch];
+	if(GetPrefBool(@"BotMode") && GetPrefBool(@"EndlessMatching")) {
+		[self endMatch];
+	}
+	else {
+		%orig;
+	}
 }
 
 -(void)opponentDisappeared{
-	[self endMatch];
+	if(GetPrefBool(@"BotMode") && GetPrefBool(@"EndlessMatching")) {
+		[self endMatch];
+	}
+	else {
+		%orig;
+	}
 }
 
 -(void)opponentSurrendered{
-	[self endMatch];
+	if(GetPrefBool(@"BotMode") && GetPrefBool(@"EndlessMatching")) {
+		[self endMatch];
+	}
+	else {
+		%orig;
+	}
 }
 
 -(void)networkErrorHappened{
-	[self endMatch];
+	if(GetPrefBool(@"BotMode") && GetPrefBool(@"EndlessMatching")) {
+		[self endMatch];
+	}
+	else {
+		%orig;
+	}
 }
 
 %end
@@ -108,10 +141,11 @@ GADBannerView *bannerView;
 //called when the transition ends
 -(void)enterTransitionDidEnd{
 	%orig;
-
-	//perfect time for a match up
-	[[%c(SceneController) sharedInstance]
-		runMatchupPreambleScene:match_scene source:nil];
+	if(match_scene && GetPrefBool(@"BotMode") && GetPrefBool(@"EndlessMatching")) {
+		//perfect time for a match up
+		[[%c(SceneController) sharedInstance]
+			runMatchupPreambleScene:match_scene source:nil];
+	}
 }
 
 %end
@@ -126,8 +160,8 @@ GADBannerView *bannerView;
 	//by using the scenecontroller we can show a QuizUp alert
 	//making it look official :)
 	[[%c(SceneController) sharedInstance]
-		showAlertWithTitle:@"QuizzerUp v2.0"
-		message:@"Enjoy the hack and follow @zumicts for updates and requests. Check out the site at quizzerup.com"];
+		showAlertWithTitle:@"QuizzerUp v2.1.1"
+		message:@"Configure the bot in the settings app. Enjoy the hack and follow @zumicts for updates and requests. Check out the site at quizzerup.com"];
 
 	//now return the original result
 	return result;
@@ -144,7 +178,8 @@ BOOL adLoaded = NO;
 	match_scene = scene;
 	%orig;
 
-	if (!adLoaded){
+	//only show ads in bot mode
+	if (!adLoaded && GetPrefBool(@"BotMode")){
 		//add as subview
 		[bannerView.rootViewController.view addSubview:bannerView];
 
