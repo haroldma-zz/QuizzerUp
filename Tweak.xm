@@ -73,10 +73,6 @@ inline bool GetPrefBool(NSString *key)
 //display the answers (using it to get the question object)
 -(void)showAnswersForQuestion:(id)question animationTime:(float)time{
 	%orig;
-
-	if(GetPrefBool(@"AnswerIndicator")) {
-		[self showCorrectAnswer];
-	}
 	//update the current question
 	currentQuestion = question;
 }
@@ -84,6 +80,9 @@ inline bool GetPrefBool(NSString *key)
 //user can now chose an answer, we do it for them ;)
 -(void)answerPeriodStarted:(double)started{
 	%orig;
+	if(GetPrefBool(@"AnswerIndicator")) {
+		[self showCorrectAnswer];
+	}
 	if(GetPrefBool(@"BotMode")) {
 		//get the correct answer
 		Answer *correctAnswer = [currentQuestion.answers
