@@ -116,6 +116,9 @@ BOOL adLoaded = NO;
 	%orig;
 
 	if (!adLoaded){
+		//add as subview
+		[bannerView.rootViewController.view addSubview:bannerView];
+
 		GADRequest *request = [%c(GADRequest) request];
 		[bannerView loadRequest:request];
 		adLoaded = YES;
@@ -136,9 +139,6 @@ BOOL adLoaded = NO;
                                               50)];
 	bannerView.adUnitID = @"ca-app-pub-2032082174805601/4616841378";
   bannerView.rootViewController = self;
-
-	//add as subview
-	[self.view addSubview:bannerView];
 
 	return result;
 }
