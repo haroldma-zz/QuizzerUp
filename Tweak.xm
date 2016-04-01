@@ -58,8 +58,8 @@ inline Application* GetApp()
 	id result = %orig;
 
 	// anything smaller than 3.0f will not work (time that it takes for the scene to be ready)
-	double indicatorDelay = 3.0f;
-	double delay = 5.0f;
+	double indicatorDelay = 1.0f;
+	double delay = 3.0f;
 	UIView *mainView = currentGameScene.contentPanel;
 	Answer *answer = [currentQuestion.answers objectAtIndex:[currentQuestion indexForAnswerID:currentQuestion.correctAnswerID]];
 
